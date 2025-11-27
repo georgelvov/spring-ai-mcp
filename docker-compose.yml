@@ -1,0 +1,19 @@
+version: '3.7'
+services:
+  ollama:
+    image: ollama/ollama
+    container_name: ollama-llama32
+    ports:
+      - "11431:11434"
+    volumes:
+      - ./ollama:/root/.ollama
+    environment:
+      - OLLAMA_ORIGINS=*
+    entrypoint: >
+      /bin/sh -c "
+        ollama serve &
+        sleep 2 &&
+        ollama pull llama3.2
+        wait
+      "
+    restart: unless-stopped

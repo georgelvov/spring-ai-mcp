@@ -1,3 +1,13 @@
+logging:
+  level:
+    org.springframework.ai.mcp: INFO
+
 spring:
   application:
     name: spring-ai-mcp-server
+  ai:
+    mcp:
+      server:
+        request-timeout: 120s
+        protocol: STREAMABLE
+        #stdio: true
