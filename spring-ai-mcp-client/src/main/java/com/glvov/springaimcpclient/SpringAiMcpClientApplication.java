@@ -9,5 +9,4 @@ public class SpringAiMcpClientApplication {
     public static void main(String[] args) {
         SpringApplication.run(SpringAiMcpClientApplication.class, args);
     }
-
 }

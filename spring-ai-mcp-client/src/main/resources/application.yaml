@@ -1,3 +1,31 @@
+logging:
+  level:
+    org.springframework.ai.mcp: INFO
+
 spring:
   application:
     name: spring-ai-mcp-client
+  main:
+    web-application-type: none
+  ai:
+    model:
+      chat: ollama
+    ollama:
+      chat:
+        model: llama3.2
+      base-url: http://localhost:11431
+    mcp:
+      client:
+        request-timeout: 120s
+        streamable-http:
+          connections:
+            my-weather-server:
+              url: http://localhost:8080
+        # Multiple mcp servers. Brave search provides web search functionality
+#        stdio:
+#          connections:
+#            brave-search:
+#              command: npx
+#              args: ["-y", "@modelcontextprotocol/server-brave-search"]
+#              env:
+#                BRAVE_API_KEY: ${BRAVE_API_KEY}
