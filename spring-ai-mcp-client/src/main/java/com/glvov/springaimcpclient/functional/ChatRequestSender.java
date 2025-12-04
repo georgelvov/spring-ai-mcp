@@ -1,5 +1,6 @@
 package com.glvov.springaimcpclient.functional;
 
+import com.glvov.springaimcpclient.mcp.McpServerNotificationHandler;
 import io.modelcontextprotocol.spec.McpSchema.CallToolRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -8,11 +9,9 @@ import org.springframework.ai.chat.client.DefaultChatClient;
 import org.springframework.ai.chat.client.advisor.ChatModelCallAdvisor;
 import org.springframework.ai.chat.client.advisor.DefaultAroundAdvisorChain;
 import org.springframework.ai.chat.client.advisor.api.CallAdvisor;
-import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.mcp.SyncMcpToolCallback;
 import org.springframework.ai.model.tool.DefaultToolCallingManager;
-import org.springframework.ai.model.tool.ToolCallingManager;
 import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.ollama.api.OllamaApi;
 import org.springframework.ai.tool.ToolCallback;
@@ -31,21 +30,27 @@ import java.util.Random;
  * </br>
  * 1. {@link DefaultChatClient.DefaultCallResponseSpec#content}
  * </br>
- * It is a call at the end of the {@link chatClient} fluent api call chain.
+ * It is a call at the end of the {@link #chatClient} fluent api call chain:
+ * <pre><code>
+ * chatClient
+ *       .prompt(USER_PROMPT)
+ *       .call()
+ *       .content(); // <-------
+ * </code></pre>
  * </br>
  * </br>
- * 2. {@link DefaultAroundAdvisorChain#nextCall}.
+ * 2. {@link DefaultAroundAdvisorChain#nextCall}
  * </br>
  * The {@link DefaultAroundAdvisorChain} manages a {@code Deque<CallAdvisor>} of call advisors.
  * It retrieves the next advisor via {@code pop()} and executes {@link CallAdvisor#adviseCall}.
  * </br>
  * </br>
  * 3. {@link ChatModelCallAdvisor#adviseCall}
- *  </br>
- *  The first and the only one advisor we call is {@link ChatModelCallAdvisor#adviseCall}.
- *  The only one is because we don't configure any other advisors, and the {@code ChatModelCallAdvisor}
- *  is default one and active by default. It calls inside the {@code chatModel.call()} method,
- *  which is in our case is an instance of {@link OllamaChatModel}.
+ * </br>
+ * The first and the only one advisor we call is {@link ChatModelCallAdvisor#adviseCall}.
+ * It is the only one because we don't configure any other advisors, and the {@code ChatModelCallAdvisor}
+ * is default one and active by default. It calls inside the {@code chatModel.call()} method,
+ * which is in our case is an instance of {@link OllamaChatModel}.
  * </br>
  * </br>
  * 4. {@link OllamaChatModel#call(Prompt)}
@@ -132,8 +137,22 @@ import java.util.Random;
  *        .meta(mcpMeta)
  *        .build();
  * </code></pre>
- * After the {@code mcpClient.callTool(callToolRequest)} is executed and the content from the MCP Server is returned
- * into {@code OllamaChatModel#internalCall} method.
+ * The {@code mcpClient.callTool(callToolRequest)} is executed.
+ * </br>
+ * </br>
+ * 6.1 Receiving a call from the MCP Server to {@link McpServerNotificationHandler#samplingHandler}.
+ * In this step, while executing {@code mcpClient.callTool(callToolRequest)} from the previous step,
+ * the MCP Server requests additional information from the MCP client via
+ * {@code McpServerNotificationHandler#samplingHandler}.
+ * In our case, the client uses LLM to generate content for the MCP Server.
+ * To do this, it invokes {@link DefaultChatClient} and follows the same sequence described in this javadoc,
+ * starting from section 1 but excluding the tool-calling part, so {@link OllamaChatModel} returns
+ * the result after the first LLM call (since no tool invocation is required).
+ * </br>
+ * </br>
+ * 6.2 The sampling information is returned to the server and
+ * the {@code mcpClient.callTool(callToolRequest)} execution is finished.
+ * Content from the MCP Server is returned to {@code OllamaChatModel#internalCall} method.
  * </br>
  * </br>
  * 7. Recursive Call to the Ollama Model.
