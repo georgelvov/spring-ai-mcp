@@ -10,4 +10,3 @@ spring:
       server:
         request-timeout: 120s
         protocol: STREAMABLE
-        #stdio: true
