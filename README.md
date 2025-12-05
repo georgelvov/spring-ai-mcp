@@ -67,7 +67,8 @@ mvn spring-boot:run
 ####  Full Flow Description ✨💡
 
 For a detailed description of the full flow of the request-processing pipeline,  
-refer to the Javadoc for the `com.glvov.springaimcpclient.functional.ChatRequestSender` class. 
+refer to this [Javadoc](https://github.com/georgelvov/spring-ai-mcp/blob/main/spring-ai-mcp-client/src/main/java/com/glvov/springaimcpclient/functional/ChatRequestSender.java).
+
 It provides a deep dive into the Spring AI module and explains how requests are handled across various components.
 
 You can view the Javadoc for `ChatRequestSender` using your IDE's documentation viewer.  
