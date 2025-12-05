@@ -1,5 +1,7 @@
 # Spring AI MCP (Model Context Protocol) Demo
 
+![MCP Schema](/images/mcp-schema.png)
+
 This project demonstrates the use of Spring AI with the Model Context Protocol (MCP) to get current weather conditions for some place.
 
 ## Project Overview
