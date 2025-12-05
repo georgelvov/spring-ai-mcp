@@ -21,6 +21,14 @@ The application flow:
 
 \* MCP Sampling feature demo part
 
+## Project Structure
+
+- `docker-compose.yml`: Configuration for the Ollama service
+- `spring-ai-mcp-server/`: The MCP server module
+- `spring-ai-mcp-client/`: The MCP client module
+
+## How to start
+
 ### 1. Start Ollama using Docker Compose
 
 From the project root directory, run:
@@ -78,9 +86,28 @@ Alternatively, you can generate the Javadoc for the project by running:
 mvn javadoc:javadoc
 ```
 
+## Troubleshooting Guide
 
-## Project Structure
+### Common Issues and Solutions
 
-- `docker-compose.yml`: Configuration for the Ollama service
-- `spring-ai-mcp-server/`: The MCP server module
-- `spring-ai-mcp-client/`: The MCP client module
+#### 1. Error: `org.springframework.ai.retry.NonTransientAiException: HTTP 400 - {"error":"model is required"}`
+
+**Description**:  
+This error occurs when a required LLM model is not properly loaded or configured in the Ollama container. Without the model, the client cannot process requests, leading to this error.
+
+**Solution**:  
+Restart the Ollama container to ensure the required model is loaded properly.  
+Run the following command in the terminal:
+
+```bash
+docker-compose restart ollama
+```
+
+Alternatively, bring down and restart all services to fully refresh the environment:
+
+```bash
+docker-compose down
+docker-compose up -d
+```
+
+After restarting, verify that the Ollama container is running and accessible on port `11431` with the correct model loaded.

@@ -46,6 +46,9 @@ public class WeatherService {
                                  @McpProgressToken
                                  String progressToken) { // (2)
 
+        log.info("getTemperature called with latitude={}, longitude={}, progressToken={}",
+                latitude, longitude, progressToken);
+
         exchange.loggingNotification(
                 LoggingMessageNotification.builder()
                         .level(LoggingLevel.INFO)
