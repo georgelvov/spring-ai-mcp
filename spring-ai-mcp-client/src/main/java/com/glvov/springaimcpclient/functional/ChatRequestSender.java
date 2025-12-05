@@ -26,47 +26,47 @@ import java.util.Random;
 
 /**
  * Full flow of the request:
- * </br>
- * </br>
+ * <br/>
+ * <br/>
  * 1. {@link DefaultChatClient.DefaultCallResponseSpec#content}
- * </br>
+ * <br/>
  * It is a call at the end of the {@link #chatClient} fluent api call chain:
  * <pre><code>
  * chatClient
  *       .prompt(USER_PROMPT)
  *       .call()
- *       .content(); // <-------
+ *       .content(); // &lt;-------
  * </code></pre>
- * </br>
- * </br>
+ * <br/>
+ * <br/>
  * 2. {@link DefaultAroundAdvisorChain#nextCall}
- * </br>
+ * <br/>
  * The {@link DefaultAroundAdvisorChain} manages a {@code Deque<CallAdvisor>} of call advisors.
  * It retrieves the next advisor via {@code pop()} and executes {@link CallAdvisor#adviseCall}.
- * </br>
- * </br>
+ * <br/>
+ * <br/>
  * 3. {@link ChatModelCallAdvisor#adviseCall}
- * </br>
+ * <br/>
  * The first and the only one advisor we call is {@link ChatModelCallAdvisor#adviseCall}.
  * It is the only one because we don't configure any other advisors, and the {@code ChatModelCallAdvisor}
  * is default one and active by default. It calls inside the {@code chatModel.call()} method,
  * which is in our case is an instance of {@link OllamaChatModel}.
- * </br>
- * </br>
+ * <br/>
+ * <br/>
  * 4. {@link OllamaChatModel#call(Prompt)}
- * </br>
- * </br>
+ * <br/>
+ * <br/>
  * 4.1 Inside the {@code call} method we call a private method -
  * {@code OllamaChatModel.internalCall(prompt, previousChatResponse)}.
  * The {@code prompt} argument contains property {@code prompt.messages} with an info like:
- * </br>
+ * <br/>
  * <pre><code>
  * UserMessage(content="Check whether in Thessaloniki...")
  * </code></pre>
- * </br>
+ * <br/>
  * 4.2 Then the {@link OllamaApi.ChatRequest} is created for the Ollama LLM containing information
  * about available MCP Server tools, which we connected to this project, e.g. via application.yaml:
- * </br>
+ * <br/>
  * <pre><code>
  *   ChatRequest(
  *       messages = Message(
@@ -86,16 +86,16 @@ import java.util.Random;
  *       )
  *   )
  * </code></pre>
- * </br>
+ * <br/>
  * This request is sent to Ollama via {@link OllamaApi#chat} method sends this request to the `Ollama` LLM.
- * </br>
- * </br>
+ * <br/>
+ * <br/>
  * 4.3 Receiving the Ollama LLM Response.
  * Ollama’s role is simply to produce a JSON-like structure for our MCP server.
  * In this case, Ollama detects that a weather tool is available, and it requires two arguments: latitude and longitude.
  * From user’s prompt in the request it extracts the city name (e.g., Thessaloniki), resolves its coordinates,
  * and returns them in a structured format.
- * </br>
+ * <br/>
  * The response from Ollama looks as follows:
  * <pre><code>
  *      OllamaResponse: Message[
@@ -115,20 +115,20 @@ import java.util.Random;
  *          thinking=null
  *      ]
  * </code></pre>
- * </br>
- * </br>
+ * <br/>
+ * <br/>
  * 5. {@link DefaultToolCallingManager#executeToolCalls}
- * </br>
+ * <br/>
  * This method is invoked as:
  * <pre><code>
  *  toolCallingManager.executeToolCalls((Original prompt from USER) prompt, (OllamaResponse from 4.3) response)
  * </code></pre>
  * Internally, {@code executeToolCall} creates {@link ToolCallback} objects (tools) and
  * executes the {@link ToolCallback#call} method, in our case is the {@link SyncMcpToolCallback#call}.
- * </br>
- * </br>
+ * <br/>
+ * <br/>
  * 6. {@link SyncMcpToolCallback#call}
- * </br>
+ * <br/>
  * A {@link CallToolRequest} is built using the tool name, arguments, and metadata:
  * <pre><code>
  *    CallToolRequest.builder()
@@ -138,8 +138,8 @@ import java.util.Random;
  *        .build();
  * </code></pre>
  * The {@code mcpClient.callTool(callToolRequest)} is executed.
- * </br>
- * </br>
+ * <br/>
+ * <br/>
  * 6.1 Receiving a call from the MCP Server to {@link McpServerNotificationHandler#samplingHandler}.
  * In this step, while executing {@code mcpClient.callTool(callToolRequest)} from the previous step,
  * the MCP Server requests additional information from the MCP client via
@@ -148,15 +148,15 @@ import java.util.Random;
  * To do this, it invokes {@link DefaultChatClient} and follows the same sequence described in this javadoc,
  * starting from section 1 but excluding the tool-calling part, so {@link OllamaChatModel} returns
  * the result after the first LLM call (since no tool invocation is required).
- * </br>
- * </br>
+ * <br/>
+ * <br/>
  * 6.2 The sampling information is returned to the server and
  * the {@code mcpClient.callTool(callToolRequest)} execution is finished.
  * Content from the MCP Server is returned to {@code OllamaChatModel#internalCall} method.
- * </br>
- * </br>
+ * <br/>
+ * <br/>
  * 7. Recursive Call to the Ollama Model.
- * </br>
+ * <br/>
  * After receiving the tool execution result, recursive call to {@code OllamaChatModel#internalCall} occurs.
  * Comparing to the section 4.1, the {@code prompt.messages} structure now differs. It contains data from MCP Server:
  * <pre><code>
@@ -183,10 +183,10 @@ import java.util.Random;
  *      )
  * </code></pre>
  * The "Weather details: 10.40°C at (40.6317, 22.9353)" text is the response from the MCP server.
- * </br>
- * </br>
+ * <br/>
+ * <br/>
  * 8. {@link OllamaApi#chat}
- * </br>
+ * <br/>
  * Second and final call to Ollama LLM (first in section 4.2). The {@code OllamaResponse} now contains smth like:
  * <pre>
  * "Ah, sunshine seeker! I've got the scoop on Thessaloniki's current weather.

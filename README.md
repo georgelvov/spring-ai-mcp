@@ -1,6 +1,6 @@
-# Spring AI MCP (Model Control Protocol) Demo
+# Spring AI MCP (Model Context Protocol) Demo
 
-This project demonstrates the use of Spring AI with the Model Control Protocol (MCP) to create a weather service that generates creative poems based on current weather conditions.
+This project demonstrates the use of Spring AI with the Model Context Protocol (MCP) to get current weather conditions for some place.
 
 ## Project Overview
 
@@ -10,14 +10,16 @@ The project consists of 2 modules:
 2. **MCP Client**: A Spring Boot application that interacts with the MCP server and uses Ollama LLM
 
 The application flow:
-- The client sends a request to check the weather in some place
+- The client sends a request to check the weather in some place to LLM
 - The Ollama LLM prepares needed arguments to call MCP server
 - MCP server is called
 - The server retrieves weather data from OpenMeteo API
-- The server requests the client to generate a poem about the weather (MCP Sampling feature demo)
-- The client uses Ollama to generate the poem and sends it back to the server
+- The server requests the client to generate a poem about the weather\*
+- The client uses Ollama to generate the poem and sends it back to the server\*
 - The server combines the weather data and poem into a final response
 - The client receives response from server, calls LLM with the final prompt and displays the final response
+
+\* MCP Sampling feature demo part
 
 ### 1. Start Ollama using Docker Compose
 
@@ -51,7 +53,7 @@ mvn spring-boot:run
 
 ### What Happens After Client Start
 
-When the client starts:
+#### When the client starts:
 
 1. It automatically sends a request to check the weather in Thessaloniki
 2. You'll see log messages showing:
@@ -61,6 +63,20 @@ When the client starts:
    - The sampling request for poem generation
    - The generated poem
    - The final response combining weather data and the poem
+
+####  Full Flow Description ✨💡
+
+For a detailed description of the full flow of the request-processing pipeline,  
+refer to the Javadoc for the `com.glvov.springaimcpclient.functional.ChatRequestSender` class. 
+It provides a deep dive into the Spring AI module and explains how requests are handled across various components.
+
+You can view the Javadoc for `ChatRequestSender` using your IDE's documentation viewer.  
+Alternatively, you can generate the Javadoc for the project by running:
+
+```bash
+mvn javadoc:javadoc
+```
+
 
 ## Project Structure
 
